@@ -76,7 +76,7 @@ public class GreetingResource {
     @Path("stream")
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void sse(@Context SseEventSink sink, @Context Sse sse){
+    public void sse(@Context SseEventSink sink){
         broadcaster.register(sink);
     }
 }
