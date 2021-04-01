@@ -32,23 +32,23 @@
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-jdbc-postgresql</artifactId>
+      <artifactId>quarkus-reactive-pg-client</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-hibernate-orm-panache</artifactId>
+      <artifactId>quarkus-hibernate-reactive-panache</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
+      <artifactId>quarkus-resteasy-reactive</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jackson</artifactId>
+      <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-client</artifactId>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jaxrs-client</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

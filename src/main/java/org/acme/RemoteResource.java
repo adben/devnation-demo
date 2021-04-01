@@ -1,18 +1,21 @@
 package org.acme;
 
 import java.net.URI;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+
+import org.jboss.resteasy.reactive.client.impl.ClientBuilderImpl;
+import org.jboss.resteasy.reactive.client.impl.UniInvoker;
+
+import io.smallrye.mutiny.Uni;
+import io.vertx.core.http.HttpClientOptions;
 
 @Path("")
 public class RemoteResource {
@@ -24,25 +27,23 @@ public class RemoteResource {
     
     @Path("fan-out")
     @GET
-    public CompletionStage<String> fanOut(@Context UriInfo uriInfo) {
+    public Uni<String> fanOut(@Context UriInfo uriInfo) {
         URI uri = uriInfo.getBaseUriBuilder().path(RemoteResource.class, "remote").build();
-        Client client = ClientBuilder.newClient();
+        Client client = new ClientBuilderImpl().httpClientOptions(new HttpClientOptions().setMaxPoolSize(1000)).build();
         WebTarget target = client.target(uri);
-        CompletionStageRxInvoker invocation = target.request().rx();
+        UniInvoker invocation = target.request().rx(UniInvoker.class);
         StringBuilder sb = new StringBuilder();
-        CompletableFuture<String>[] calls = new CompletableFuture[CALLS];
+        Uni<?>[] calls = new Uni[CALLS];
         for(int i=0;i<CALLS;i++) {
             calls[i] = invocation.get(String.class)
-                    .whenComplete((val, t) -> sb.append(val).append(", "))
-                    .toCompletableFuture();
+                    .invoke(val -> sb.append(val).append(", "));
         }
-        return CompletableFuture.allOf(calls).thenApply(v -> sb.toString());
+        return Uni.combine().all().unis(calls).discardItems().map(v -> sb.toString());
     }
     
     @Path("remote")
     @GET
-    public int remote() throws InterruptedException {
-        Thread.sleep(CALL_DURATION_MS);
-        return counter.getAndIncrement();
+    public Uni<Integer> remote() throws InterruptedException {
+        return Uni.createFrom().item(counter.getAndIncrement()).onItem().delayIt().by(Duration.ofMillis(CALL_DURATION_MS));
     }   
 }
