@@ -3,14 +3,15 @@ package org.acme;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 import io.vertx.core.json.JsonObject;
 
-public class MyExceptionMapper {
+@Provider
+public class MyExceptionMapper implements ExceptionMapper<NotFoundException> {
     
-    @ServerExceptionMapper
+    @Override
     public Response toResponse(NotFoundException exception) {
         return Response.status(Response.Status.NOT_FOUND)
                 .entity(new JsonObject()
