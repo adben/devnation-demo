@@ -2,7 +2,6 @@ package org.acme;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
@@ -15,25 +14,18 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.sse.Sse;
-import javax.ws.rs.sse.SseBroadcaster;
-import javax.ws.rs.sse.SseEventSink;
 
-import org.jboss.resteasy.plugins.providers.sse.SseImpl;
+import org.jboss.resteasy.annotations.SseElementType;
+
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 
 @Singleton
 @Path("/")
 public class GreetingResource {
 
-    @Context
-    private Sse sse = new SseImpl();
-    private SseBroadcaster broadcaster;
+    private BroadcastProcessor<Fruit> broadcaster = BroadcastProcessor.create();
 
-    @PostConstruct
-    void init() {
-        broadcaster = sse.newBroadcaster();
-    }
-    
     @Path("hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -66,17 +58,15 @@ public class GreetingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Fruit addFruit(Fruit f){
         f.persist();
-        broadcaster.broadcast(sse.newEventBuilder()
-                              .data(f)
-                              .mediaType(MediaType.APPLICATION_JSON_TYPE)
-                              .build());
+        broadcaster.onNext(f);
         return f;
     }
 
     @Path("stream")
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void sse(@Context SseEventSink sink){
-        broadcaster.register(sink);
+    @SseElementType(MediaType.APPLICATION_JSON)
+    public Multi<Fruit> sse(){
+        return broadcaster;
     }
 }
