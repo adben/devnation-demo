@@ -8,17 +8,15 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.reactive.server.ServerRequestFilter;
-import org.jboss.resteasy.reactive.server.ServerResponseFilter;
+@Provider
+public class MyFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-public class MyFilter {
-
-    @ServerRequestFilter
+    @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         System.err.println("Making a request for "+requestContext.getMethod()+" "+requestContext.getUriInfo().getRequestUri());
     }
 
-    @ServerResponseFilter
+    @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         System.err.println("Response is "+responseContext.getStatus()+" "+responseContext.getStatusInfo().getReasonPhrase()+" with body: "+responseContext.getEntity());
     }

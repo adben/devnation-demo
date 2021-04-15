@@ -4,8 +4,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import io.smallrye.mutiny.Uni;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
 public class Fruit extends PanacheEntity {
@@ -20,7 +19,7 @@ public class Fruit extends PanacheEntity {
         this.color = color;
     }
 
-    public static Uni<List<Fruit>> findByColor(String color) {
+    public static List<Fruit> findByColor(String color) {
         return list("color", color);
     }
 }
