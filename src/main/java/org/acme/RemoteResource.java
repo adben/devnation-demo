@@ -26,6 +26,7 @@ public class RemoteResource {
     @GET
     public CompletionStage<String> fanOut(@Context UriInfo uriInfo) {
         URI uri = uriInfo.getBaseUriBuilder().path(RemoteResource.class, "remote").build();
+//        Client client = new ClientBuilderImpl().httpClientOptions(new HttpClientOptions().setMaxPoolSize(1000)).build();
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(uri);
         CompletionStageRxInvoker invocation = target.request().rx();
