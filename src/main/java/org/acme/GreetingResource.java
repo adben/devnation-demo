@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import org.jboss.resteasy.annotations.SseElementType;
 
 import io.smallrye.mutiny.Multi;
@@ -39,14 +40,14 @@ public class GreetingResource {
     public List<Fruit> fruits(@QueryParam("color") String color){
         if(color != null)
             return Fruit.findByColor(color);
-        return Fruit.listAll();
+        return PanacheEntityBase.listAll();
     }
 
     @Path("fruit/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Fruit fruit(@PathParam("id") Long id){
-        Fruit ret = Fruit.findById(id);
+        Fruit ret = PanacheEntityBase.findById(id);
         if(ret == null)
             throw new NotFoundException();
         return ret;
